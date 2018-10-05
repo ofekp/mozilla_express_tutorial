@@ -1,5 +1,0 @@
-#FROM andresvidal/rpi3-mongodb3
-##RUN mkdir -p /usr/deployment_scripts
-#WORKDIR /
-#COPY deployment_scripts/add_user.sh /
-#CMD ["mongod"]
