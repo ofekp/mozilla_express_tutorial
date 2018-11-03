@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
   mongo:
     container_name: mongo
@@ -31,17 +31,34 @@ services:
     depends_on:
       - mongo
 
-  app:
-    container_name: app
-    restart: always
-    build: .
+  server:
+    container_name: server
+    restart: on-failure:10
+    build: ./server/  # this is also the context folder of the build
     volumes:
-      - .:/usr/src/app
+      - ./server/:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       - mongoClientTemp
     links:
       - mongo
-    command: npm run devstart
+    command: npm run devserver
+
+  client:
+    container_name: client
+    restart: on-failure:10
+    build: ./client/  # this is also the context folder of the build
+    volumes:
+      - ./client/:/usr/src/app/
+      - /usr/src/app/node_modules
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    command: npm start
+    # env_file:
+    #   - ./.env

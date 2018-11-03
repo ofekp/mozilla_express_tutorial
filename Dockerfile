@@ -1,10 +1,24 @@
+# client
+
+FROM node:latest as client
+
+WORKDIR /usr/src/app/client
+COPY client/package*.json ./
+RUN npm install -qy
+COPY client/ ./
+RUN npm run build
+
+# server
+
 FROM node:latest
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-#COPY package*.json /usr/src/app
-RUN npm install
-#COPY . .
-#COPY . /usr/src/app  # using `volumes` in docker-compose.yml instead of this
-#EXPOSE 3000  # no need since this is in the compose file
-#CMD ["npm", "start"]  # no need since this is in the compose file
-#CMD ["npm", "run", "devstart"]
+
+WORKDIR /usr/src/app/
+COPY --from=client /usr/src/app/client/build/ ./client/build/
+
+WORKDIR /usr/src/app/server
+COPY server/package*.json ./
+RUN npm install -qy
+
+EXPOSE 8000
+
+CMD ["npm", "start"]
